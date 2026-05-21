@@ -75,6 +75,40 @@
            focus:outline-none focus:ring-2 focus:ring-terra-400 focus:ring-offset-2;
   }
 
+  .btn-hero-outline {
+    @apply inline-flex items-center gap-3 px-8 py-4 border border-cream-200/35
+           text-cream-100 font-sans text-xs tracking-widest-2 uppercase backdrop-blur-sm
+           transition-all duration-500 hover:border-cream-200/55 hover:text-cream-50
+           focus:outline-none focus:ring-2 focus:ring-cream-200/50 focus:ring-offset-2 focus:ring-offset-forest-700;
+    background-color: rgba(253, 250, 245, 0.05);
+  }
+
+  .btn-hero-outline:hover {
+    background-color: rgba(253, 250, 245, 0.12);
+  }
+
+  .hero-cinematic .hero-image {
+    object-position: center 38%;
+  }
+
+  @media (min-width: 640px) {
+    .hero-cinematic .hero-image {
+      object-position: center 42%;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero-cinematic .hero-image {
+      object-position: center 48%;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .hero-cinematic .hero-image {
+      object-position: center center;
+    }
+  }
+
   .divider-ornament {
     @apply flex items-center gap-4 my-6;
   }
