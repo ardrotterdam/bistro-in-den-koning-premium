@@ -130,9 +130,10 @@ const seasonColors: Record<Season, { accent: string; bg: string; badge: string }
 }
 
 interface SeasonMeta {
-  index:  string
-  months: string
-  image:  string
+  index:          string
+  months:         string
+  image:          string
+  imagePosition?: string
 }
 
 const seasonMeta: Record<Season, SeasonMeta> = {
@@ -142,9 +143,10 @@ const seasonMeta: Record<Season, SeasonMeta> = {
     image:  'https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=1200&q=80&auto=format&fit=crop',
   },
   Zomer: {
-    index:  '02',
-    months: 'Juni — Augustus',
-    image:  'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&q=80&auto=format&fit=crop',
+    index:          '02',
+    months:         'Juni — Augustus',
+    image:          '/images/season-zomer.png',
+    imagePosition:  'center 42%',
   },
   Herfst: {
     index:  '03',
@@ -286,9 +288,10 @@ export default function SeasonalMenu() {
                   {/* Image panel */}
                   <div className="relative w-[42%] overflow-hidden sm:w-[45%] lg:w-full lg:flex-1">
                     <div
-                      className="absolute inset-0 bg-cover bg-center will-change-transform duration-[1600ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-110"
+                      className="absolute inset-0 bg-cover will-change-transform duration-[1600ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-110"
                       style={{
-                        backgroundImage: `url(${meta.image})`,
+                        backgroundImage:    `url(${meta.image})`,
+                        backgroundPosition: meta.imagePosition ?? 'center',
                         transitionProperty: 'transform',
                       }}
                     />
