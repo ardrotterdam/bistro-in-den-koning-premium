@@ -2,9 +2,9 @@ import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 
-const IMAGE_1 = 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80&auto=format&fit=crop'
-const IMAGE_2 = 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80&auto=format&fit=crop'
-const IMAGE_3 = 'https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=800&q=80&auto=format&fit=crop'
+const IMAGE_1 = 'https://images.unsplash.com/photo-1750943036999-81e666b2296c?w=1200&q=80&auto=format&fit=crop'
+const IMAGE_2 = 'https://images.unsplash.com/photo-1659100777438-abf898a1c47c?w=800&q=80&auto=format&fit=crop'
+const IMAGE_3 = 'https://images.unsplash.com/photo-1776775464105-cc74282fb286?w=1600&q=80&auto=format&fit=crop'
 
 function FadeIn({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.15 })
@@ -111,7 +111,7 @@ export default function About() {
               >
                 <img
                   src={IMAGE_1}
-                  alt="Gerechten van Bistro In den Koning"
+                  alt="Verfijnd gerecht met wijn — Bistro In den Koning"
                   className="w-full h-full object-cover"
                 />
               </motion.div>
@@ -123,7 +123,7 @@ export default function About() {
             >
               <img
                 src={IMAGE_2}
-                alt="Interieur Bistro In den Koning"
+                alt="Klassiek Europees restaurantinterieur"
                 className="w-full h-full object-cover"
               />
             </motion.div>
@@ -185,7 +185,7 @@ export default function About() {
         >
           <img
             src={IMAGE_3}
-            alt="Sfeer Bistro In den Koning"
+            alt="Kaarsverlichte eetzaal met wijnglazen"
             className="w-full h-[120%] object-cover object-center"
           />
           <div className="absolute inset-0 bg-forest-600/40" />

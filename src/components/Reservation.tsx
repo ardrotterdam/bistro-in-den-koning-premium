@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 
-const BG_IMAGE = 'https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=2000&q=80&auto=format&fit=crop'
+const BG_IMAGE = 'https://images.unsplash.com/photo-1776775464105-cc74282fb286?w=2000&q=80&auto=format&fit=crop'
 
 function FadeIn({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 })

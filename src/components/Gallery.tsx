@@ -27,9 +27,9 @@ const images: GalleryImage[] = [
   },
   {
     id:      3,
-    src:     'https://images.unsplash.com/photo-1493770348161-369560ae357d?w=800&q=80&auto=format&fit=crop',
-    alt:     'Ambachtelijk brood',
-    caption: 'Dagelijks vers gebakken',
+    src:     'https://images.unsplash.com/photo-1683025192578-ae647c9d897a?w=800&q=80&auto=format&fit=crop',
+    alt:     'Gerecht met wijn op tafel',
+    caption: 'Wijn en keuken in harmonie',
     span:    'col-1',
   },
   {
@@ -41,9 +41,9 @@ const images: GalleryImage[] = [
   },
   {
     id:      5,
-    src:     'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80&auto=format&fit=crop',
-    alt:     'Sfeer in het restaurant',
-    caption: 'Bourgondische sfeer',
+    src:     'https://images.unsplash.com/photo-1654448192121-f2032fb826a7?w=1200&q=80&auto=format&fit=crop',
+    alt:     'Kaarsverlicht interieur Bistro In den Koning',
+    caption: 'Intieme avondsfeer',
     span:    'col-2',
   },
   {
@@ -55,9 +55,9 @@ const images: GalleryImage[] = [
   },
   {
     id:      7,
-    src:     'https://images.unsplash.com/photo-1484980972926-edee96e0960d?w=800&q=80&auto=format&fit=crop',
-    alt:     'Tafelschikking',
-    caption: 'Elk detail telt',
+    src:     'https://images.unsplash.com/photo-1748355734689-6fc3aa65bb75?w=800&q=80&auto=format&fit=crop',
+    alt:     'Tafelschikking met linnen, wijn en kaarslicht',
+    caption: 'Linnen, wijn en hout',
     span:    'col-1',
   },
   {
