@@ -1,15 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import zomerSeasonImage from '@/assets/images/season-zomer.png'
-import {
-  categoryHeaderImages,
-  dishAccentImages,
-  menuCrop,
-  seasonTabImages,
-  specialtyDishImages,
-  type MenuCategory,
-} from '@/data/menuImages'
 
 type Season = 'Lente' | 'Zomer' | 'Herfst' | 'Winter'
 
@@ -141,90 +132,18 @@ const seasonColors: Record<Season, { accent: string; bg: string; badge: string }
 interface SeasonMeta {
   index:          string
   months:         string
-  image:          string
-  imagePosition?: string
 }
 
-function buildSeasonMeta(): Record<Season, SeasonMeta> {
-  const tab = (id: number) => menuCrop(id, 900, 680) ?? ''
-
-  return {
-    Lente: {
-      index:          '01',
-      months:         'Maart — Mei',
-      image:          tab(seasonTabImages.Lente!.id),
-      imagePosition:  seasonTabImages.Lente!.position,
-    },
-    Zomer: {
-      index:          '02',
-      months:         'Juni — Augustus',
-      image:          zomerSeasonImage,
-      imagePosition:  'center 42%',
-    },
-    Herfst: {
-      index:          '03',
-      months:         'September — November',
-      image:          tab(seasonTabImages.Herfst!.id),
-      imagePosition:  seasonTabImages.Herfst!.position,
-    },
-    Winter: {
-      index:          '04',
-      months:         'December — Februari',
-      image:          tab(seasonTabImages.Winter!.id),
-      imagePosition:  seasonTabImages.Winter!.position,
-    },
-  }
+const seasonMeta: Record<Season, SeasonMeta> = {
+  Lente:  { index: '01', months: 'Maart — Mei' },
+  Zomer:  { index: '02', months: 'Juni — Augustus' },
+  Herfst: { index: '03', months: 'September — November' },
+  Winter: { index: '04', months: 'December — Februari' },
 }
 
-const seasonMeta = buildSeasonMeta()
-
-function CinematicCrop({
-  src,
-  alt,
-  className = '',
-  position = 'center',
-}: {
-  src:       string
-  alt:       string
-  className?: string
-  position?: string
-}) {
+function CategoryHeader({ label }: { label: string }) {
   return (
-    <div className={`relative overflow-hidden ${className}`}>
-      <img
-        src={src}
-        alt={alt}
-        loading="lazy"
-        decoding="async"
-        className="absolute inset-0 h-full w-full object-cover scale-[1.08]"
-        style={{ objectPosition: position }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-forest-700/25 via-transparent to-cream-200/10" />
-    </div>
-  )
-}
-
-function CategoryHeader({
-  label,
-  season,
-}: {
-  label:  string
-  season: Season
-}) {
-  const imageId = categoryHeaderImages[season][label as MenuCategory]
-  const src     = imageId ? menuCrop(imageId, 480, 112) : undefined
-
-  return (
-    <div className="mb-6">
-      {src && (
-        <CinematicCrop
-          src={src}
-          alt=""
-          aria-hidden
-          className="mb-4 h-14 sm:h-[4.5rem] lg:h-16 opacity-90"
-          position="center 42%"
-        />
-      )}
+    <div className="mb-7">
       <div className="flex items-center gap-3">
         <div className="w-6 h-px bg-gold-300" />
         <p className="font-sans text-2xs tracking-widest-3 uppercase text-terra-400">
@@ -237,21 +156,12 @@ function CategoryHeader({
 
 function DishCard({
   dish,
-  season,
   colors,
 }: {
   dish:   Dish
-  season: Season
   colors: typeof seasonColors[Season]
 }) {
   const isSpecialty  = dish.tag === 'Seizoenspecialiteit'
-  const specialtySrc = isSpecialty && specialtyDishImages[dish.name]
-    ? menuCrop(specialtyDishImages[dish.name]!, 720, 180)
-    : undefined
-  const accentId     = dishAccentImages[season][dish.name]
-  const accentSrc    = accentId && dish.highlight && !isSpecialty
-    ? menuCrop(accentId, 96, 128)
-    : undefined
 
   return (
     <div
@@ -259,17 +169,7 @@ function DishCard({
         dish.highlight ? 'bg-white/30' : 'bg-transparent'
       } ${isSpecialty ? 'ring-1 ring-inset ring-gold-200/20' : ''}`}
     >
-      {specialtySrc && (
-        <CinematicCrop
-          src={specialtySrc}
-          alt=""
-          aria-hidden
-          className="h-20 sm:h-24 lg:h-[6.5rem]"
-          position="center 38%"
-        />
-      )}
-
-      <div className={`relative p-5 ${accentSrc ? 'pr-16 sm:pr-[4.75rem]' : ''}`}>
+      <div className="relative p-5">
         {dish.tag && (
           <span className={`inline-block font-sans text-2xs tracking-widest-2 uppercase px-2 py-1 mb-3 ${colors.badge}`}>
             {dish.tag}
@@ -291,23 +191,6 @@ function DishCard({
           <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-terra-400" />
         )}
       </div>
-
-      {accentSrc && (
-        <div
-          className="pointer-events-none absolute right-0 top-0 bottom-0 hidden w-14 overflow-hidden opacity-80 sm:block"
-          aria-hidden
-        >
-          <img
-            src={accentSrc}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            className="h-full w-full object-cover scale-110"
-            style={{ objectPosition: 'center 40%' }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-l from-transparent via-cream-200/20 to-cream-200/85" />
-        </div>
-      )}
     </div>
   )
 }
@@ -363,7 +246,7 @@ export default function SeasonalMenu() {
           </FadeIn>
         </div>
 
-        {/* Season selector — editorial cards */}
+        {/* Season selector — text-first editorial cards */}
         <FadeIn delay={0.25} className="mb-14 lg:mb-20">
           <div
             role="tablist"
@@ -384,7 +267,7 @@ export default function SeasonalMenu() {
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.7, delay: 0.3 + i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
-                  className={`group relative isolate flex h-36 sm:h-40 lg:h-[420px] flex-row overflow-hidden text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-300 focus-visible:ring-offset-4 focus-visible:ring-offset-cream-200 lg:flex-col-reverse ${
+                  className={`group relative isolate min-h-32 overflow-hidden text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-300 focus-visible:ring-offset-4 focus-visible:ring-offset-cream-200 sm:min-h-36 lg:min-h-44 ${
                     isActive
                       ? 'shadow-[0_30px_60px_-25px_rgba(26,51,41,0.45)]'
                       : 'shadow-[0_8px_24px_-18px_rgba(26,51,41,0.35)] hover:shadow-[0_20px_40px_-22px_rgba(26,51,41,0.4)]'
@@ -392,7 +275,7 @@ export default function SeasonalMenu() {
                 >
                   {/* Text panel */}
                   <div
-                    className={`relative z-10 flex flex-1 flex-col justify-between p-5 sm:p-6 lg:h-[150px] lg:flex-none lg:p-6 ${
+                    className={`relative z-10 flex min-h-32 flex-col justify-between p-5 sm:min-h-36 sm:p-6 lg:min-h-44 lg:p-7 ${
                       isActive
                         ? 'bg-forest-500'
                         : 'bg-cream-100 group-hover:bg-cream-50'
@@ -437,32 +320,6 @@ export default function SeasonalMenu() {
                     </div>
                   </div>
 
-                  {/* Image panel */}
-                  <div className="relative w-[42%] overflow-hidden sm:w-[45%] lg:w-full lg:flex-1">
-                    <div
-                      className="absolute inset-0 bg-cover will-change-transform duration-[1600ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-110"
-                      style={{
-                        backgroundImage:    `url(${meta.image})`,
-                        backgroundPosition: meta.imagePosition ?? 'center',
-                        transitionProperty: 'transform',
-                      }}
-                    />
-                    {/* Cinematic gradient — blends image toward text panel */}
-                    <div
-                      className={`absolute inset-0 bg-gradient-to-r lg:bg-gradient-to-t ${
-                        isActive
-                          ? 'from-forest-700/35 via-forest-700/5 to-transparent'
-                          : 'from-forest-700/65 via-forest-700/20 to-transparent'
-                      } transition-opacity duration-700`}
-                    />
-                    {/* Cream desaturation wash on idle */}
-                    <div
-                      className={`absolute inset-0 bg-cream-200 mix-blend-soft-light transition-opacity duration-700 ${
-                        isActive ? 'opacity-0' : 'opacity-45 group-hover:opacity-20'
-                      }`}
-                    />
-                  </div>
-
                   {/* Gold accent — vertical on mobile, horizontal on desktop */}
                   <div
                     className={`pointer-events-none absolute left-0 top-0 z-20 h-full w-[3px] bg-gold-300 transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] lg:bottom-0 lg:top-auto lg:h-[3px] lg:w-full ${
@@ -494,14 +351,13 @@ export default function SeasonalMenu() {
           >
             {menuData[activeSeason].map((section) => (
               <div key={section.label}>
-                <CategoryHeader label={section.label} season={activeSeason} />
+                <CategoryHeader label={section.label} />
 
                 <div className="flex flex-col gap-6">
                   {section.items.map((dish) => (
                     <DishCard
                       key={dish.name}
                       dish={dish}
-                      season={activeSeason}
                       colors={colors}
                     />
                   ))}
