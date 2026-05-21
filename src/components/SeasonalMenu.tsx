@@ -129,6 +129,35 @@ const seasonColors: Record<Season, { accent: string; bg: string; badge: string }
   Winter: { accent: 'text-cream-400',  bg: 'bg-forest-50',   badge: 'bg-cream-200 text-forest-400' },
 }
 
+interface SeasonMeta {
+  index:  string
+  months: string
+  image:  string
+}
+
+const seasonMeta: Record<Season, SeasonMeta> = {
+  Lente: {
+    index:  '01',
+    months: 'Maart — Mei',
+    image:  'https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=1200&q=80&auto=format&fit=crop',
+  },
+  Zomer: {
+    index:  '02',
+    months: 'Juni — Augustus',
+    image:  'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&q=80&auto=format&fit=crop',
+  },
+  Herfst: {
+    index:  '03',
+    months: 'September — November',
+    image:  'https://images.unsplash.com/photo-1683025192578-ae647c9d897a?w=1200&q=80&auto=format&fit=crop',
+  },
+  Winter: {
+    index:  '04',
+    months: 'December — Februari',
+    image:  'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=1200&q=80&auto=format&fit=crop',
+  },
+}
+
 function FadeIn({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 })
   return (
@@ -180,32 +209,121 @@ export default function SeasonalMenu() {
           </FadeIn>
         </div>
 
-        {/* Season selector */}
-        <FadeIn delay={0.25} className="mb-14">
-          <div className="flex justify-center">
-            <div className="inline-flex bg-cream-100 border border-gold-200/50 p-1 gap-1">
-              {seasons.map(season => (
-                <button
+        {/* Season selector — editorial cards */}
+        <FadeIn delay={0.25} className="mb-14 lg:mb-20">
+          <div
+            role="tablist"
+            aria-label="Seizoenen"
+            className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5"
+          >
+            {seasons.map((season, i) => {
+              const meta     = seasonMeta[season]
+              const isActive = activeSeason === season
+
+              return (
+                <motion.button
                   key={season}
+                  role="tab"
+                  aria-selected={isActive}
                   onClick={() => setActiveSeason(season)}
-                  className={`relative px-6 py-3 font-sans text-xs tracking-widest-2 uppercase transition-all duration-300 ${
-                    activeSeason === season
-                      ? 'bg-forest-500 text-cream-100'
-                      : 'text-forest-400/70 hover:text-forest-500'
-                  }`}
+                  whileTap={{ scale: 0.985 }}
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.7, delay: 0.3 + i * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className={`group relative isolate flex h-36 sm:h-40 lg:h-[420px] flex-row overflow-hidden text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-gold-300 focus-visible:ring-offset-4 focus-visible:ring-offset-cream-200 lg:flex-col-reverse ${
+                    isActive
+                      ? 'shadow-[0_30px_60px_-25px_rgba(26,51,41,0.45)]'
+                      : 'shadow-[0_8px_24px_-18px_rgba(26,51,41,0.35)] hover:shadow-[0_20px_40px_-22px_rgba(26,51,41,0.4)]'
+                  } transition-shadow duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]`}
                 >
-                  {season}
-                  {activeSeason === season && (
-                    <motion.span
-                      className="absolute inset-0 bg-forest-500"
-                      layoutId="season-pill"
-                      style={{ zIndex: -1 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                  {/* Text panel */}
+                  <div
+                    className={`relative z-10 flex flex-1 flex-col justify-between p-5 sm:p-6 lg:h-[150px] lg:flex-none lg:p-6 ${
+                      isActive
+                        ? 'bg-forest-500'
+                        : 'bg-cream-100 group-hover:bg-cream-50'
+                    } transition-colors duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <span
+                        className={`font-sans text-2xs tracking-widest-3 uppercase ${
+                          isActive ? 'text-gold-200' : 'text-forest-400/45'
+                        } transition-colors duration-700`}
+                      >
+                        Seizoen · {meta.index}
+                      </span>
+                      <motion.span
+                        aria-hidden
+                        initial={false}
+                        animate={{
+                          opacity: isActive ? 1 : 0,
+                          scale:   isActive ? 1 : 0.3,
+                        }}
+                        transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="mt-1.5 h-1.5 w-1.5 rounded-full bg-gold-300"
+                      />
+                    </div>
+
+                    <div>
+                      <h3
+                        className={`mb-1.5 font-display font-light leading-none ${
+                          isActive ? 'text-cream-50' : 'text-forest-500'
+                        } transition-colors duration-700`}
+                        style={{ fontSize: 'clamp(1.875rem, 5vw, 2.75rem)', letterSpacing: '-0.01em' }}
+                      >
+                        {season}
+                      </h3>
+                      <p
+                        className={`font-sans text-2xs font-light tracking-widest-2 uppercase ${
+                          isActive ? 'text-gold-200/85' : 'text-terra-400/85'
+                        } transition-colors duration-700`}
+                      >
+                        {meta.months}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Image panel */}
+                  <div className="relative w-[42%] overflow-hidden sm:w-[45%] lg:w-full lg:flex-1">
+                    <div
+                      className="absolute inset-0 bg-cover bg-center will-change-transform duration-[1600ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-110"
+                      style={{
+                        backgroundImage: `url(${meta.image})`,
+                        transitionProperty: 'transform',
+                      }}
                     />
-                  )}
-                </button>
-              ))}
-            </div>
+                    {/* Cinematic gradient — blends image toward text panel */}
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-r lg:bg-gradient-to-t ${
+                        isActive
+                          ? 'from-forest-700/35 via-forest-700/5 to-transparent'
+                          : 'from-forest-700/65 via-forest-700/20 to-transparent'
+                      } transition-opacity duration-700`}
+                    />
+                    {/* Cream desaturation wash on idle */}
+                    <div
+                      className={`absolute inset-0 bg-cream-200 mix-blend-soft-light transition-opacity duration-700 ${
+                        isActive ? 'opacity-0' : 'opacity-45 group-hover:opacity-20'
+                      }`}
+                    />
+                  </div>
+
+                  {/* Gold accent — vertical on mobile, horizontal on desktop */}
+                  <div
+                    className={`pointer-events-none absolute left-0 top-0 z-20 h-full w-[3px] bg-gold-300 transition-all duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] lg:bottom-0 lg:top-auto lg:h-[3px] lg:w-full ${
+                      isActive ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  />
+
+                  {/* Hairline outer border */}
+                  <div
+                    className={`pointer-events-none absolute inset-0 z-20 border transition-colors duration-700 ${
+                      isActive ? 'border-gold-300/30' : 'border-gold-200/25'
+                    }`}
+                  />
+                </motion.button>
+              )
+            })}
           </div>
         </FadeIn>
 
