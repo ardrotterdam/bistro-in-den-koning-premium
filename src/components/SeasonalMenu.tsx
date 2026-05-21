@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
+import zomerSeasonImage from '@/assets/images/season-zomer.png'
 
 type Season = 'Lente' | 'Zomer' | 'Herfst' | 'Winter'
 
@@ -145,7 +146,7 @@ const seasonMeta: Record<Season, SeasonMeta> = {
   Zomer: {
     index:          '02',
     months:         'Juni — Augustus',
-    image:          '/images/season-zomer.png',
+    image:          zomerSeasonImage,
     imagePosition:  'center 42%',
   },
   Herfst: {
