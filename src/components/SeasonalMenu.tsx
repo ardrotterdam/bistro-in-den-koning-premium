@@ -201,6 +201,18 @@ function DishCard({
   )
 }
 
+/**
+ * MenuAccentImage — a single, small, floating editorial dish photo.
+ *
+ * Design rules:
+ *  - Portrait crop, never landscape (avoids gallery feeling).
+ *  - Soft rounded shape, no padding frame, no polaroid border, no rotation.
+ *  - One unified cinematic treatment (warm candlelight, low saturation, dark
+ *    forest gradient) so every dish photo shares the same atmosphere.
+ *  - Slight negative margin so the image reads as floating into the column
+ *    margin rather than as a structural block within it.
+ *  - Hidden on small screens — the menu stays purely text-first on mobile.
+ */
 function MenuAccentImage({
   accent,
   index,
@@ -208,32 +220,53 @@ function MenuAccentImage({
   accent: MenuImageAccent
   index:  number
 }) {
-  const src = resolveMenuImageSrc(accent.image, 520, 340)
+  const src = resolveMenuImageSrc(accent.image, 480, 600)
   if (!src) return null
 
-  const alignClass = accent.align === 'right' ? 'self-end rotate-[1.5deg]' : 'self-start -rotate-[1.5deg]'
+  const alignClass =
+    accent.align === 'right'
+      ? 'self-end -mr-1 sm:-mr-3 lg:-mr-6'
+      : 'self-start -ml-1 sm:-ml-3 lg:-ml-6'
 
   return (
     <motion.figure
       aria-label={accent.image.alt}
-      className={`group relative hidden w-[68%] max-w-[15rem] sm:block lg:w-[72%] ${alignClass}`}
-      initial={{ opacity: 0, y: 18, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.65, delay: index * 0.04, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className={`relative hidden w-[55%] max-w-[10.5rem] py-2 sm:block ${alignClass}`}
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.4 }}
+      transition={{ duration: 1.1, delay: index * 0.05, ease: [0.25, 0.46, 0.45, 0.94] }}
     >
-      <div className="border border-gold-200/45 bg-cream-50 p-1.5 shadow-[0_22px_50px_-32px_rgba(26,51,41,0.75)]">
-        <div className="relative aspect-[4/3] overflow-hidden bg-forest-500">
-          <img
-            src={src}
-            alt={accent.image.alt}
-            loading="lazy"
-            decoding="async"
-            className="h-full w-full object-cover transition-transform duration-[1200ms] ease-editorial group-hover:scale-[1.04]"
-            style={{ objectPosition: accent.image.position ?? 'center' }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-forest-700/25 via-transparent to-cream-100/5" />
-          <div className="absolute inset-0 ring-1 ring-inset ring-cream-50/20" />
-        </div>
+      <div
+        className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem]"
+        style={{
+          boxShadow: '0 20px 40px -28px rgba(26, 51, 41, 0.55)',
+        }}
+      >
+        <img
+          src={src}
+          alt={accent.image.alt}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover"
+          style={{
+            objectPosition: accent.image.position ?? 'center',
+            // Unified cinematic treatment — warm candlelight, lifted shadows,
+            // slightly desaturated, gentle sepia warmth.
+            filter: 'brightness(0.9) contrast(1.05) saturate(0.82) sepia(0.08)',
+          }}
+        />
+        {/* Dark forest vignette at the bottom — pulls every accent into the
+            same warm, low-light bistro atmosphere. */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(165deg, rgba(26,51,41,0) 35%, rgba(26,51,41,0.12) 70%, rgba(26,51,41,0.4) 100%)',
+          }}
+        />
+        {/* Hairline cream rim for that printed-page editorial feel */}
+        <div className="pointer-events-none absolute inset-0 rounded-[1.75rem] ring-1 ring-inset ring-cream-50/15" />
       </div>
     </motion.figure>
   )
