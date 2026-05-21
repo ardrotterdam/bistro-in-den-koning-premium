@@ -2,6 +2,14 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import zomerSeasonImage from '@/assets/images/season-zomer.png'
+import {
+  categoryHeaderImages,
+  dishAccentImages,
+  menuCrop,
+  seasonTabImages,
+  specialtyDishImages,
+  type MenuCategory,
+} from '@/data/menuImages'
 
 type Season = 'Lente' | 'Zomer' | 'Herfst' | 'Winter'
 
@@ -137,28 +145,171 @@ interface SeasonMeta {
   imagePosition?: string
 }
 
-const seasonMeta: Record<Season, SeasonMeta> = {
-  Lente: {
-    index:  '01',
-    months: 'Maart — Mei',
-    image:  'https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=1200&q=80&auto=format&fit=crop',
-  },
-  Zomer: {
-    index:          '02',
-    months:         'Juni — Augustus',
-    image:          zomerSeasonImage,
-    imagePosition:  'center 42%',
-  },
-  Herfst: {
-    index:  '03',
-    months: 'September — November',
-    image:  'https://images.unsplash.com/photo-1683025192578-ae647c9d897a?w=1200&q=80&auto=format&fit=crop',
-  },
-  Winter: {
-    index:  '04',
-    months: 'December — Februari',
-    image:  'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=1200&q=80&auto=format&fit=crop',
-  },
+function buildSeasonMeta(): Record<Season, SeasonMeta> {
+  const tab = (id: number) => menuCrop(id, 900, 680) ?? ''
+
+  return {
+    Lente: {
+      index:          '01',
+      months:         'Maart — Mei',
+      image:          tab(seasonTabImages.Lente!.id),
+      imagePosition:  seasonTabImages.Lente!.position,
+    },
+    Zomer: {
+      index:          '02',
+      months:         'Juni — Augustus',
+      image:          zomerSeasonImage,
+      imagePosition:  'center 42%',
+    },
+    Herfst: {
+      index:          '03',
+      months:         'September — November',
+      image:          tab(seasonTabImages.Herfst!.id),
+      imagePosition:  seasonTabImages.Herfst!.position,
+    },
+    Winter: {
+      index:          '04',
+      months:         'December — Februari',
+      image:          tab(seasonTabImages.Winter!.id),
+      imagePosition:  seasonTabImages.Winter!.position,
+    },
+  }
+}
+
+const seasonMeta = buildSeasonMeta()
+
+function CinematicCrop({
+  src,
+  alt,
+  className = '',
+  position = 'center',
+}: {
+  src:       string
+  alt:       string
+  className?: string
+  position?: string
+}) {
+  return (
+    <div className={`relative overflow-hidden ${className}`}>
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        className="absolute inset-0 h-full w-full object-cover scale-[1.08]"
+        style={{ objectPosition: position }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-forest-700/25 via-transparent to-cream-200/10" />
+    </div>
+  )
+}
+
+function CategoryHeader({
+  label,
+  season,
+}: {
+  label:  string
+  season: Season
+}) {
+  const imageId = categoryHeaderImages[season][label as MenuCategory]
+  const src     = imageId ? menuCrop(imageId, 480, 112) : undefined
+
+  return (
+    <div className="mb-6">
+      {src && (
+        <CinematicCrop
+          src={src}
+          alt=""
+          aria-hidden
+          className="mb-4 h-14 sm:h-[4.5rem] lg:h-16 opacity-90"
+          position="center 42%"
+        />
+      )}
+      <div className="flex items-center gap-3">
+        <div className="w-6 h-px bg-gold-300" />
+        <p className="font-sans text-2xs tracking-widest-3 uppercase text-terra-400">
+          {label}
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function DishCard({
+  dish,
+  season,
+  colors,
+}: {
+  dish:   Dish
+  season: Season
+  colors: typeof seasonColors[Season]
+}) {
+  const isSpecialty  = dish.tag === 'Seizoenspecialiteit'
+  const specialtySrc = isSpecialty && specialtyDishImages[dish.name]
+    ? menuCrop(specialtyDishImages[dish.name]!, 720, 180)
+    : undefined
+  const accentId     = dishAccentImages[season][dish.name]
+  const accentSrc    = accentId && dish.highlight && !isSpecialty
+    ? menuCrop(accentId, 96, 128)
+    : undefined
+
+  return (
+    <div
+      className={`group relative overflow-hidden border-gold-hairline transition-all duration-300 hover:bg-white/40 ${
+        dish.highlight ? 'bg-white/30' : 'bg-transparent'
+      } ${isSpecialty ? 'ring-1 ring-inset ring-gold-200/20' : ''}`}
+    >
+      {specialtySrc && (
+        <CinematicCrop
+          src={specialtySrc}
+          alt=""
+          aria-hidden
+          className="h-20 sm:h-24 lg:h-[6.5rem]"
+          position="center 38%"
+        />
+      )}
+
+      <div className={`relative p-5 ${accentSrc ? 'pr-16 sm:pr-[4.75rem]' : ''}`}>
+        {dish.tag && (
+          <span className={`inline-block font-sans text-2xs tracking-widest-2 uppercase px-2 py-1 mb-3 ${colors.badge}`}>
+            {dish.tag}
+          </span>
+        )}
+        <div className="flex justify-between items-start gap-4 mb-2">
+          <h3 className="font-display text-lg font-medium text-forest-500 leading-tight">
+            {dish.name}
+          </h3>
+          <span className={`font-display text-xl font-light flex-shrink-0 ${colors.accent}`}>
+            €{dish.price}
+          </span>
+        </div>
+        <p className="font-sans text-sm font-light text-forest-400/75 leading-relaxed">
+          {dish.description}
+        </p>
+
+        {dish.highlight && (
+          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-terra-400" />
+        )}
+      </div>
+
+      {accentSrc && (
+        <div
+          className="pointer-events-none absolute right-0 top-0 bottom-0 hidden w-14 overflow-hidden opacity-80 sm:block"
+          aria-hidden
+        >
+          <img
+            src={accentSrc}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-cover scale-110"
+            style={{ objectPosition: 'center 40%' }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-l from-transparent via-cream-200/20 to-cream-200/85" />
+        </div>
+      )}
+    </div>
+  )
 }
 
 function FadeIn({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
@@ -343,42 +494,16 @@ export default function SeasonalMenu() {
           >
             {menuData[activeSeason].map((section) => (
               <div key={section.label}>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-6 h-px bg-gold-300" />
-                  <p className="font-sans text-2xs tracking-widest-3 uppercase text-terra-400">
-                    {section.label}
-                  </p>
-                </div>
+                <CategoryHeader label={section.label} season={activeSeason} />
 
                 <div className="flex flex-col gap-6">
                   {section.items.map((dish) => (
-                    <div
+                    <DishCard
                       key={dish.name}
-                      className={`group relative p-5 border-gold-hairline transition-all duration-300 hover:bg-white/40 ${
-                        dish.highlight ? 'bg-white/30' : 'bg-transparent'
-                      }`}
-                    >
-                      {dish.tag && (
-                        <span className={`inline-block font-sans text-2xs tracking-widest-2 uppercase px-2 py-1 mb-3 ${colors.badge}`}>
-                          {dish.tag}
-                        </span>
-                      )}
-                      <div className="flex justify-between items-start gap-4 mb-2">
-                        <h3 className="font-display text-lg font-medium text-forest-500 leading-tight">
-                          {dish.name}
-                        </h3>
-                        <span className={`font-display text-xl font-light flex-shrink-0 ${colors.accent}`}>
-                          €{dish.price}
-                        </span>
-                      </div>
-                      <p className="font-sans text-sm font-light text-forest-400/75 leading-relaxed">
-                        {dish.description}
-                      </p>
-
-                      {dish.highlight && (
-                        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-terra-400" />
-                      )}
-                    </div>
+                      dish={dish}
+                      season={activeSeason}
+                      colors={colors}
+                    />
                   ))}
                 </div>
               </div>
