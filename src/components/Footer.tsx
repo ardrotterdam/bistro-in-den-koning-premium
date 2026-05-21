@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 
@@ -17,11 +18,6 @@ function FadeIn({ children, delay = 0, className = '' }: { children: React.React
 }
 
 export default function Footer() {
-  const handleScroll = (href: string) => {
-    const el = document.querySelector(href)
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
   return (
     <footer className="bg-forest-700 relative overflow-hidden">
 
@@ -54,18 +50,18 @@ export default function Footer() {
             </p>
             <nav className="flex flex-col gap-3">
               {[
-                { label: 'Ons Verhaal', href: '#verhaal' },
-                { label: 'Seizoensmenu',href: '#menu' },
-                { label: 'Galerij',     href: '#galerij' },
-                { label: 'Reserveren', href: '#reserveren' },
+                { label: 'Ons Verhaal',  href: '/ons-verhaal' },
+                { label: 'Seizoensmenu', href: '/menu' },
+                { label: 'Galerij',      href: '/galerij' },
+                { label: 'Reserveren',   href: '/reserveren' },
               ].map(link => (
-                <button
+                <Link
                   key={link.href}
-                  onClick={() => handleScroll(link.href)}
-                  className="font-sans text-sm text-cream-300/60 hover:text-gold-300 transition-colors duration-300 text-left"
+                  to={link.href}
+                  className="font-sans text-sm text-cream-300/60 hover:text-gold-300 transition-colors duration-300"
                 >
                   {link.label}
-                </button>
+                </Link>
               ))}
             </nav>
           </FadeIn>

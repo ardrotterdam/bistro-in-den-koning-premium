@@ -1,25 +1,32 @@
 import { useState, useEffect } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const navLinks = [
-  { label: 'Ons Verhaal', href: '#verhaal' },
-  { label: 'Menu',        href: '#menu' },
-  { label: 'Galerij',    href: '#galerij' },
-  { label: 'Reserveren', href: '#reserveren' },
+  { label: 'Ons Verhaal', href: '/ons-verhaal' },
+  { label: 'Menu',        href: '/menu' },
+  { label: 'Galerij',    href: '/galerij' },
+  { label: 'Reserveren', href: '/reserveren' },
 ]
 
 export default function Navigation() {
   const [scrolled, setScrolled]   = useState(false)
   const [menuOpen, setMenuOpen]   = useState(false)
-  const [atTop, setAtTop]         = useState(true)
+  const location                  = useLocation()
+  const isHome                    = location.pathname === '/'
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [location.pathname])
 
   useEffect(() => {
     const handleScroll = () => {
-      const y = window.scrollY
-      setScrolled(y > 60)
-      setAtTop(y < 20)
+      setScrolled(window.scrollY > 60)
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
+    // Reset on mount in case page loaded scrolled
+    handleScroll()
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
@@ -28,13 +35,10 @@ export default function Navigation() {
     return () => { document.body.style.overflow = '' }
   }, [menuOpen])
 
-  const handleNavClick = (href: string) => {
-    setMenuOpen(false)
-    const el = document.querySelector(href)
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
-  }
+  const isActive = (href: string) => location.pathname === href
+
+  // On non-home pages always show solid bg; on home page only after scroll
+  const showSolid = !isHome || scrolled || menuOpen
 
   return (
     <>
@@ -42,7 +46,7 @@ export default function Navigation() {
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
           menuOpen
             ? 'bg-[#0B2118] py-4'
-            : scrolled
+            : showSolid
             ? 'bg-forest-600/95 backdrop-blur-md py-4 shadow-2xl'
             : 'bg-transparent py-6'
         }`}
@@ -55,49 +59,54 @@ export default function Navigation() {
           {/* Left links — desktop */}
           <div className="hidden lg:flex items-center gap-10">
             {navLinks.slice(0, 2).map(link => (
-              <button
+              <Link
                 key={link.href}
-                onClick={() => handleNavClick(link.href)}
+                to={link.href}
                 className={`font-sans text-xs tracking-widest-2 uppercase transition-colors duration-300 ${
-                  atTop ? 'text-cream-200 hover:text-gold-300' : 'text-cream-200 hover:text-gold-300'
-                }`}
-              >
-                {link.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Logo — center */}
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="flex flex-col items-center gap-1 group"
-          >
-            <span className={`font-display text-xl md:text-2xl font-light tracking-[0.15em] uppercase transition-colors duration-300 ${
-              scrolled || menuOpen ? 'text-gold-300' : 'text-cream-50'
-            }`}>
-              In den Koning
-            </span>
-            <span className={`font-sans text-2xs tracking-widest-3 uppercase transition-colors duration-300 ${
-              scrolled || menuOpen ? 'text-gold-200/70' : 'text-cream-200/70'
-            }`}>
-              Bistro · Waterlandkerkje
-            </span>
-          </button>
-
-          {/* Right links — desktop */}
-          <div className="hidden lg:flex items-center gap-10">
-            {navLinks.slice(2).map(link => (
-              <button
-                key={link.href}
-                onClick={() => handleNavClick(link.href)}
-                className={`font-sans text-xs tracking-widest-2 uppercase transition-colors duration-300 ${
-                  link.href === '#reserveren'
-                    ? 'text-terra-300 hover:text-terra-200 border border-terra-400/40 px-4 py-2 hover:border-terra-300'
+                  isActive(link.href)
+                    ? 'text-gold-300'
                     : 'text-cream-200 hover:text-gold-300'
                 }`}
               >
                 {link.label}
-              </button>
+              </Link>
+            ))}
+          </div>
+
+          {/* Logo — center */}
+          <Link to="/" className="flex flex-col items-center gap-1 group">
+            <span className={`font-display text-xl md:text-2xl font-light tracking-[0.15em] uppercase transition-colors duration-300 ${
+              showSolid ? 'text-gold-300' : 'text-cream-50'
+            }`}>
+              In den Koning
+            </span>
+            <span className={`font-sans text-2xs tracking-widest-3 uppercase transition-colors duration-300 ${
+              showSolid ? 'text-gold-200/70' : 'text-cream-200/70'
+            }`}>
+              Bistro · Waterlandkerkje
+            </span>
+          </Link>
+
+          {/* Right links — desktop */}
+          <div className="hidden lg:flex items-center gap-10">
+            {navLinks.slice(2).map(link => (
+              <Link
+                key={link.href}
+                to={link.href}
+                className={`font-sans text-xs tracking-widest-2 uppercase transition-colors duration-300 ${
+                  link.href === '/reserveren'
+                    ? `border px-4 py-2 ${
+                        isActive(link.href)
+                          ? 'border-terra-300 text-terra-200'
+                          : 'text-terra-300 hover:text-terra-200 border-terra-400/40 hover:border-terra-300'
+                      }`
+                    : isActive(link.href)
+                    ? 'text-gold-300'
+                    : 'text-cream-200 hover:text-gold-300'
+                }`}
+              >
+                {link.label}
+              </Link>
             ))}
           </div>
 
@@ -111,19 +120,19 @@ export default function Navigation() {
             <motion.span
               animate={menuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
               className={`block w-6 h-px transition-colors duration-300 ${
-                menuOpen ? 'bg-gold-300' : scrolled ? 'bg-cream-200' : 'bg-cream-100'
+                menuOpen ? 'bg-gold-300' : 'bg-cream-200'
               }`}
             />
             <motion.span
               animate={menuOpen ? { opacity: 0 } : { opacity: 1 }}
               className={`block w-4 h-px transition-colors duration-300 ${
-                menuOpen ? 'bg-gold-300' : scrolled ? 'bg-cream-200' : 'bg-cream-100'
+                menuOpen ? 'bg-gold-300' : 'bg-cream-200'
               }`}
             />
             <motion.span
               animate={menuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
               className={`block w-6 h-px transition-colors duration-300 ${
-                menuOpen ? 'bg-gold-300' : scrolled ? 'bg-cream-200' : 'bg-cream-100'
+                menuOpen ? 'bg-gold-300' : 'bg-cream-200'
               }`}
             />
           </button>
@@ -142,20 +151,25 @@ export default function Navigation() {
           >
             <nav className="flex flex-col items-center gap-12">
               {navLinks.map((link, i) => (
-                <motion.button
+                <motion.div
                   key={link.href}
-                  onClick={() => handleNavClick(link.href)}
-                  className={`font-display text-3xl font-light tracking-wide transition-colors duration-300 ${
-                    link.href === '#reserveren'
-                      ? 'text-gold-300 hover:text-gold-200'
-                      : 'text-cream-100 hover:text-gold-300'
-                  }`}
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.08 + i * 0.07, duration: 0.45 }}
                 >
-                  {link.label}
-                </motion.button>
+                  <Link
+                    to={link.href}
+                    className={`font-display text-3xl font-light tracking-wide transition-colors duration-300 ${
+                      isActive(link.href)
+                        ? 'text-gold-300'
+                        : link.href === '/reserveren'
+                        ? 'text-gold-300 hover:text-gold-200'
+                        : 'text-cream-100 hover:text-gold-300'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                </motion.div>
               ))}
             </nav>
 

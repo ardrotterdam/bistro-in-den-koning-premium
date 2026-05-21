@@ -1,4 +1,5 @@
 import { Fragment, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import {
@@ -290,6 +291,7 @@ function FadeIn({ children, delay = 0, className = '' }: { children: React.React
 export default function SeasonalMenu() {
   const [activeSeason, setActiveSeason] = useState<Season>('Herfst')
   const colors = seasonColors[activeSeason]
+  const navigate = useNavigate()
 
   return (
     <section id="menu" className="bg-cream-200 relative overflow-hidden py-28 lg:py-36">
@@ -468,7 +470,7 @@ export default function SeasonalMenu() {
               Alle prijzen zijn inclusief BTW.
             </p>
             <button
-              onClick={() => document.querySelector('#reserveren')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => navigate('/reserveren')}
               className="btn-secondary"
             >
               Tafel Reserveren

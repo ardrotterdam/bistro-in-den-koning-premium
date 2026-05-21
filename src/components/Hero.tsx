@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { motion, useScroll, useTransform, useReducedMotion } from 'framer-motion'
 
 const HERO_BASE = '/images/in-den-koning-hero'
@@ -11,6 +12,7 @@ export default function Hero() {
   const ref = useRef<HTMLElement>(null)
   const [loaded, setLoaded] = useState(false)
   const prefersReducedMotion = useReducedMotion()
+  const navigate = useNavigate()
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -33,13 +35,8 @@ export default function Hero() {
     }
   }, [])
 
-  const handleReserve = () => {
-    document.querySelector('#reserveren')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
-  const handleMenu = () => {
-    document.querySelector('#menu')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
+  const handleReserve = () => navigate('/reserveren')
+  const handleMenu    = () => navigate('/menu')
 
   return (
     <section
