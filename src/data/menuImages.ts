@@ -3,6 +3,26 @@ import { galleryImages, wixImage } from './galleryImages'
 export type MenuSeason = 'Lente' | 'Zomer' | 'Herfst' | 'Winter'
 export type MenuCategory = 'Voorgerechten' | 'Hoofdgerechten' | 'Desserts'
 
+export type MenuImageSource =
+  | {
+      kind:       'real'
+      galleryId:  number
+      alt:        string
+      position?:  string
+    }
+  | {
+      kind:      'generated'
+      src:       string
+      alt:       string
+      position?: string
+    }
+
+export interface MenuImageAccent {
+  afterDish: string
+  align:     'left' | 'right'
+  image:     MenuImageSource
+}
+
 export function getGalleryImage(id: number) {
   return galleryImages.find((img) => img.id === id)
 }
@@ -14,64 +34,104 @@ export function menuCrop(id: number, width: number, height: number): string | un
   return wixImage(img.src, width, height)
 }
 
-/** Season tab backgrounds — authentic dish photography only */
-export const seasonTabImages: Partial<Record<MenuSeason, { id: number; position?: string }>> = {
-  Lente:  { id: 4,  position: 'center 45%' },   // Asperge 'Mimosa'
-  Herfst: { id: 8,  position: 'center 40%' },   // Wildplank
-  Winter: { id: 37, position: 'center 35%' },   // Gevulde Vissoep
-}
-
-/** Small category header accents — one per column, per season */
-export const categoryHeaderImages: Record<MenuSeason, Partial<Record<MenuCategory, number>>> = {
-  Lente: {
-    Voorgerechten:  4,   // Asperge 'Mimosa'
-    Hoofdgerechten: 24,  // Zeewolf
-    Desserts:       3,   // 'Bijna Zomer' Parfait
-  },
-  Zomer: {
-    Voorgerechten:  27,  // Burrata & Granité
-    Hoofdgerechten: 6,   // Varkenswangetjes
-    Desserts:       21,  // Crème Brûleé
-  },
-  Herfst: {
-    Voorgerechten:  8,   // Wildplank
-    Hoofdgerechten: 18,  // Poussin
-    Desserts:       35,  // Opa's Appeltaart
-  },
-  Winter: {
-    Voorgerechten:  37,  // Gevulde Vissoep
-    Hoofdgerechten: 6,   // Varkenswangetjes
-    Desserts:       31,  // Riz Condé met Kersen
-  },
+export function resolveMenuImageSrc(image: MenuImageSource, width: number, height: number): string | undefined {
+  return image.kind === 'real'
+    ? menuCrop(image.galleryId, width, height)
+    : image.src
 }
 
 /**
- * Dish-level image accents — only where menu item closely matches gallery caption.
- * Omit entries rather than force a visual mismatch.
+ * Sparse editorial image accents for the seasonal menu.
+ * Real images are Bistro In den Koning gallery photos; generated entries are local placeholders
+ * used only where no matching real dish photo is available.
  */
-export const dishAccentImages: Record<MenuSeason, Partial<Record<string, number>>> = {
+export const menuImageAccents: Record<MenuSeason, Partial<Record<MenuCategory, MenuImageAccent[]>>> = {
   Lente: {
-    'Zeeuwse mosselen':  38,
-    'Lente-asperges':    4,
-    'Kaasplankje':       1,
-    'Aardbeienvacherin': 3,
+    Voorgerechten: [
+      {
+        afterDish: 'Lente-asperges',
+        align:     'right',
+        // Real Bistro In den Koning photo: Asperge 'Mimosa'
+        image:     { kind: 'real', galleryId: 4, alt: "Asperge 'Mimosa'", position: 'center 45%' },
+      },
+    ],
+    Desserts: [
+      {
+        afterDish: 'Aardbeienvacherin',
+        align:     'left',
+        // Real Bistro In den Koning photo: 'Bijna Zomer' parfait
+        image:     { kind: 'real', galleryId: 3, alt: 'Witte chocolade parfait met aardbei en framboos' },
+      },
+    ],
   },
   Zomer: {
-    'Burrata':           30,
-    'Varkensbuik':       6,
-    'Crème brûlée':      21,
+    Voorgerechten: [
+      {
+        afterDish: 'Ceviche van zeebaars',
+        align:     'right',
+        // Generated placeholder: no matching real Bistro In den Koning ceviche photo available
+        image:     {
+          kind: 'generated',
+          src:  '/images/menu/generated-ceviche-zeebaars.jpg',
+          alt:  'Ceviche van zeebaars met limoen, koriander en avocado',
+        },
+      },
+    ],
+    Hoofdgerechten: [
+      {
+        afterDish: 'Gegrilde kreeft',
+        align:     'left',
+        // Generated placeholder: no matching real Bistro In den Koning lobster photo available
+        image:     {
+          kind: 'generated',
+          src:  '/images/menu/generated-gegrilde-kreeft.jpg',
+          alt:  'Gegrilde Zeeuwse kreeft met venkel en saffraanboter',
+        },
+      },
+    ],
+    Desserts: [
+      {
+        afterDish: 'Crème brûlée',
+        align:     'right',
+        // Real Bistro In den Koning photo: Crème Brûleé
+        image:     { kind: 'real', galleryId: 21, alt: 'Crème brûlée', position: 'center 45%' },
+      },
+    ],
   },
   Herfst: {
-    'Tarte tatin':       35,
-    'Chocolade fondant': 26,
+    Hoofdgerechten: [
+      {
+        afterDish: 'Haas à la royale',
+        align:     'right',
+        // Real Bistro In den Koning photo: Wildplank, used as a seasonal game accent
+        image:     { kind: 'real', galleryId: 8, alt: 'Wildplank', position: 'center 45%' },
+      },
+    ],
+    Desserts: [
+      {
+        afterDish: 'Tarte tatin',
+        align:     'left',
+        // Real Bistro In den Koning photo: Opa's Appeltaart
+        image:     { kind: 'real', galleryId: 35, alt: "Opa's appeltaart", position: 'center 50%' },
+      },
+    ],
   },
   Winter: {
-    'Stoofvlees à la Flamande': 6,
-    'Warme rijstepap':   31,
+    Voorgerechten: [
+      {
+        afterDish: 'Bisque de homard',
+        align:     'left',
+        // Real Bistro In den Koning photo: Gevulde Vissoep, used as a winter seafood accent
+        image:     { kind: 'real', galleryId: 37, alt: 'Gevulde vissoep', position: 'center 35%' },
+      },
+    ],
+    Hoofdgerechten: [
+      {
+        afterDish: 'Stoofvlees à la Flamande',
+        align:     'right',
+        // Real Bistro In den Koning photo: Varkenswangetjes, used as a slow-braised dish accent
+        image:     { kind: 'real', galleryId: 6, alt: 'Varkenswangetjes', position: 'center 45%' },
+      },
+    ],
   },
-}
-
-/** Featured image for Seizoenspecialiteit cards — only exact matches */
-export const specialtyDishImages: Partial<Record<string, number>> = {
-  // 'Gegrilde kreeft' intentionally omitted — no authentic lobster image
 }

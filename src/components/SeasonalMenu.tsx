@@ -1,6 +1,12 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
+import {
+  menuImageAccents,
+  resolveMenuImageSrc,
+  type MenuCategory,
+  type MenuImageAccent,
+} from '../data/menuImages'
 
 type Season = 'Lente' | 'Zomer' | 'Herfst' | 'Winter'
 
@@ -13,7 +19,7 @@ interface Dish {
 }
 
 interface MenuSection {
-  label: string
+  label: MenuCategory
   items: Dish[]
 }
 
@@ -195,6 +201,44 @@ function DishCard({
   )
 }
 
+function MenuAccentImage({
+  accent,
+  index,
+}: {
+  accent: MenuImageAccent
+  index:  number
+}) {
+  const src = resolveMenuImageSrc(accent.image, 520, 340)
+  if (!src) return null
+
+  const alignClass = accent.align === 'right' ? 'self-end rotate-[1.5deg]' : 'self-start -rotate-[1.5deg]'
+
+  return (
+    <motion.figure
+      aria-label={accent.image.alt}
+      className={`group relative hidden w-[68%] max-w-[15rem] sm:block lg:w-[72%] ${alignClass}`}
+      initial={{ opacity: 0, y: 18, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.65, delay: index * 0.04, ease: [0.25, 0.46, 0.45, 0.94] }}
+    >
+      <div className="border border-gold-200/45 bg-cream-50 p-1.5 shadow-[0_22px_50px_-32px_rgba(26,51,41,0.75)]">
+        <div className="relative aspect-[4/3] overflow-hidden bg-forest-500">
+          <img
+            src={src}
+            alt={accent.image.alt}
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-cover transition-transform duration-[1200ms] ease-editorial group-hover:scale-[1.04]"
+            style={{ objectPosition: accent.image.position ?? 'center' }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-forest-700/25 via-transparent to-cream-100/5" />
+          <div className="absolute inset-0 ring-1 ring-inset ring-cream-50/20" />
+        </div>
+      </div>
+    </motion.figure>
+  )
+}
+
 function FadeIn({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.1 })
   return (
@@ -349,21 +393,37 @@ export default function SeasonalMenu() {
             transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="grid lg:grid-cols-3 gap-8"
           >
-            {menuData[activeSeason].map((section) => (
+            {menuData[activeSeason].map((section) => {
+              const accents = menuImageAccents[activeSeason][section.label] ?? []
+
+              return (
               <div key={section.label}>
                 <CategoryHeader label={section.label} />
 
                 <div className="flex flex-col gap-6">
-                  {section.items.map((dish) => (
-                    <DishCard
-                      key={dish.name}
-                      dish={dish}
-                      colors={colors}
-                    />
-                  ))}
+                  {section.items.map((dish) => {
+                    const dishAccents = accents.filter((accent) => accent.afterDish === dish.name)
+
+                    return (
+                      <Fragment key={dish.name}>
+                        <DishCard
+                          dish={dish}
+                          colors={colors}
+                        />
+                        {dishAccents.map((accent, accentIndex) => (
+                          <MenuAccentImage
+                            key={`${dish.name}-${accent.image.alt}`}
+                            accent={accent}
+                            index={accentIndex}
+                          />
+                        ))}
+                      </Fragment>
+                    )
+                  })}
                 </div>
               </div>
-            ))}
+              )
+            })}
           </motion.div>
         </AnimatePresence>
 
