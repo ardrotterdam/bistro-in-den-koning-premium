@@ -23,6 +23,11 @@ export default function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [menuOpen])
+
   const handleNavClick = (href: string) => {
     setMenuOpen(false)
     const el = document.querySelector(href)
@@ -35,7 +40,9 @@ export default function Navigation() {
     <>
       <motion.header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ${
-          scrolled
+          menuOpen
+            ? 'bg-[#0B2118] py-4'
+            : scrolled
             ? 'bg-forest-600/95 backdrop-blur-md py-4 shadow-2xl'
             : 'bg-transparent py-6'
         }`}
@@ -66,12 +73,12 @@ export default function Navigation() {
             className="flex flex-col items-center gap-1 group"
           >
             <span className={`font-display text-xl md:text-2xl font-light tracking-[0.15em] uppercase transition-colors duration-300 ${
-              scrolled ? 'text-gold-300' : 'text-cream-50'
+              scrolled || menuOpen ? 'text-gold-300' : 'text-cream-50'
             }`}>
               In den Koning
             </span>
             <span className={`font-sans text-2xs tracking-widest-3 uppercase transition-colors duration-300 ${
-              scrolled ? 'text-gold-200/70' : 'text-cream-200/70'
+              scrolled || menuOpen ? 'text-gold-200/70' : 'text-cream-200/70'
             }`}>
               Bistro · Waterlandkerkje
             </span>
@@ -96,21 +103,28 @@ export default function Navigation() {
 
           {/* Hamburger — mobile */}
           <button
-            className="lg:hidden flex flex-col gap-1.5 p-2"
+            className="lg:hidden flex flex-col gap-1.5 p-2 -mr-2"
             onClick={() => setMenuOpen(v => !v)}
-            aria-label="Menu openen"
+            aria-label={menuOpen ? 'Menu sluiten' : 'Menu openen'}
+            aria-expanded={menuOpen}
           >
             <motion.span
               animate={menuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-              className={`block w-6 h-px transition-colors duration-300 ${scrolled ? 'bg-cream-200' : 'bg-cream-100'}`}
+              className={`block w-6 h-px transition-colors duration-300 ${
+                menuOpen ? 'bg-gold-300' : scrolled ? 'bg-cream-200' : 'bg-cream-100'
+              }`}
             />
             <motion.span
               animate={menuOpen ? { opacity: 0 } : { opacity: 1 }}
-              className={`block w-4 h-px transition-colors duration-300 ${scrolled ? 'bg-cream-200' : 'bg-cream-100'}`}
+              className={`block w-4 h-px transition-colors duration-300 ${
+                menuOpen ? 'bg-gold-300' : scrolled ? 'bg-cream-200' : 'bg-cream-100'
+              }`}
             />
             <motion.span
               animate={menuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
-              className={`block w-6 h-px transition-colors duration-300 ${scrolled ? 'bg-cream-200' : 'bg-cream-100'}`}
+              className={`block w-6 h-px transition-colors duration-300 ${
+                menuOpen ? 'bg-gold-300' : scrolled ? 'bg-cream-200' : 'bg-cream-100'
+              }`}
             />
           </button>
         </nav>
@@ -120,21 +134,25 @@ export default function Navigation() {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            className="fixed inset-0 z-40 bg-forest-600/98 backdrop-blur-md flex flex-col items-center justify-center"
-            initial={{ opacity: 0, clipPath: 'circle(0% at 95% 5%)' }}
-            animate={{ opacity: 1, clipPath: 'circle(150% at 95% 5%)' }}
-            exit={{ opacity: 0, clipPath: 'circle(0% at 95% 5%)' }}
-            transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="fixed inset-0 z-40 bg-[#0B2118] flex flex-col items-center justify-center lg:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
           >
-            <nav className="flex flex-col items-center gap-8">
+            <nav className="flex flex-col items-center gap-12">
               {navLinks.map((link, i) => (
                 <motion.button
                   key={link.href}
                   onClick={() => handleNavClick(link.href)}
-                  className="font-display text-3xl font-light text-cream-100 hover:text-gold-300 transition-colors duration-300"
-                  initial={{ opacity: 0, y: 20 }}
+                  className={`font-display text-3xl font-light tracking-wide transition-colors duration-300 ${
+                    link.href === '#reserveren'
+                      ? 'text-gold-300 hover:text-gold-200'
+                      : 'text-cream-100 hover:text-gold-300'
+                  }`}
+                  initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 + i * 0.08, duration: 0.5 }}
+                  transition={{ delay: 0.08 + i * 0.07, duration: 0.45 }}
                 >
                   {link.label}
                 </motion.button>
@@ -142,15 +160,16 @@ export default function Navigation() {
             </nav>
 
             <motion.div
-              className="absolute bottom-12 flex flex-col items-center gap-2"
+              className="absolute bottom-12 flex flex-col items-center gap-3"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.4 }}
             >
-              <p className="font-sans text-xs tracking-widest-2 uppercase text-cream-300/60">
+              <span className="w-8 h-px bg-gold-300/40" aria-hidden="true" />
+              <p className="font-sans text-xs tracking-widest-2 uppercase text-cream-200/80">
                 Do – Ma · 11:00
               </p>
-              <p className="font-sans text-xs tracking-widest-2 uppercase text-terra-300">
+              <p className="font-sans text-xs tracking-widest-2 uppercase text-gold-300/80">
                 Waterlandkerkje, Zeeuws-Vlaanderen
               </p>
             </motion.div>
