@@ -2,7 +2,7 @@ import Navigation   from '../components/Navigation'
 import Hero         from '../components/Hero'
 import About        from '../components/About'
 import SeasonalMenu from '../components/SeasonalMenu'
-import Gallery      from '../components/Gallery'
+import DishGallery  from '../components/DishGallery'
 import Testimonials from '../components/Testimonials'
 import Reservation  from '../components/Reservation'
 import Footer       from '../components/Footer'
@@ -15,7 +15,7 @@ export default function Home() {
         <Hero />
         <About />
         <SeasonalMenu />
-        <Gallery />
+        <DishGallery />
         <Testimonials />
         <Reservation />
       </main>
